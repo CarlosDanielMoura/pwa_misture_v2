@@ -1,0 +1,33 @@
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  darkMode: "class",
+  content: ["./index.html", "./src/**/*.{ts,tsx,js,jsx}"],
+  theme: {
+    extend: {
+      colors: {
+        green: {
+          400: "var(--green-400)",
+          500: "var(--green-500)",
+          600: "var(--green-600)",
+        },
+        red: {
+          400: "var(--red-400)",
+          600: "var(--red-600)",
+        },
+        gray: {
+          400: "var(--gray-400)",
+          500: "var(--gray-500)",
+        },
+        white: {
+          400: "var(--white-400)",
+          500: "var(--white-500)",
+          600: "var(--white-600)",
+        },
+        black: {
+          600: "var(--black-600)",
+        },
+      },
+    },
+  },
+  plugins: [require("tailwindcss-animate")],
+};
