@@ -1,13 +1,13 @@
 import { twMerge } from "tailwind-merge";
 import { iconsData } from "../data/IconsData";
-import { FC, useState } from "react";
+import { useState } from "react";
 
 interface NavBarBottomProps {
   className?: string;
 }
 
 const NavBarBottom: React.FC<NavBarBottomProps> = ({ className }) => {
-  const [activeIndex, setActiveIndex] = useState<number | null>(null); // Estado para o botão ativo
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
   return (
     <nav
       className={twMerge(
