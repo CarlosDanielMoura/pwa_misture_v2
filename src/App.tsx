@@ -1,13 +1,8 @@
-import { Header } from "./components/Heander";
+import { Header } from "./components/Header";
 import { NavBarBottom } from "./components/NavBar";
 
 function App() {
-  return (
-    <>
-      <Header />
-      <NavBarBottom className="md:hidden" />
-    </>
-  );
+  return <></>;
 }
 
 export default App;
