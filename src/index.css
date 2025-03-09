@@ -7,6 +7,11 @@
   }
 }
 
+@font-face {
+  font-family: "Aceh";
+  src: url(assets/fonts/Aceh-Light.ttf);
+}
+
 :root {
   /* Greens*/
   --green-400: #b4e8cb;

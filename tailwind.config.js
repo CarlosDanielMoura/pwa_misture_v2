@@ -4,6 +4,10 @@ module.exports = {
   content: ["./index.html", "./src/**/*.{ts,tsx,js,jsx}"],
   theme: {
     extend: {
+      fontFamily: {
+        jura: ["Jura", "sans-serif"],
+        aceh: ["Aceh", "sans-serif"],
+      },
       colors: {
         green: {
           400: "var(--green-400)",

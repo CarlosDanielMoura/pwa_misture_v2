@@ -15,7 +15,7 @@ interface IconData {
 const iconsData: IconData[] = [
   {
     id: 1,
-    label: "Home",
+    label: "Dashboard",
     icon: GoHomeFill,
   },
   {
