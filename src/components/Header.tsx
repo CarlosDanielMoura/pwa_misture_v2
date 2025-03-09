@@ -16,7 +16,7 @@ const Header: React.FC<HeaderProps> = ({ className }) => {
           `${className}`
         )}
       >
-        <img src={Img_Logo} alt="Logo Sistema pwa Misture" />
+        <img src={Img_Logo} width={200} alt="Logo Sistema pwa Misture" />
         <span className="flex justify-center items-center w-10 h-10 border-none bg-white-600 rounded-lg hover:cursor-pointer hover:shadow-md hover:opacity-85">
           <UserRound size={24} color="#379276" />
         </span>
