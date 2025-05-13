@@ -32,6 +32,9 @@ module.exports = {
           600: "var(--black-600)",
         },
       },
+      height: {
+        "calc-full-mobile": "calc(100vh - 100px)", // Adiciona a classe h-calc-full
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],

@@ -10,35 +10,35 @@ interface IconData {
   label: string;
   icon: React.ComponentType<React.SVGProps<SVGSVGElement>>; // Tipo do ícone
   activeClass?: string; // Classe opcional para estilos ativos
+  path: string; // Caminho para navegação
+  isRemoved?: boolean; // Validação opcional
 }
-
 const iconsData: IconData[] = [
   {
     id: 1,
     label: "Dashboard",
     icon: GoHomeFill,
+    path: "/",
   },
   {
     id: 2,
     label: "Chart Stats",
     icon: MdInsertChartOutlined,
-  },
-  {
-    id: 3,
-    label: "Filter",
-    icon: HiMiniSquares2X2,
-    activeClass: "bg-green-400 text-green-700 rounded-full",
+    path: "/graph",
   },
   {
     id: 4,
     label: "Profile",
     icon: UserRound,
+    path: "/profile",
   },
   {
     id: 5,
     label: "Settings",
     icon: Settings,
+    path: "/settings",
   },
 ];
+
 
 export { iconsData };
