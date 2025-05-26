@@ -1,7 +1,7 @@
 const buscarResultados = async (userId: string) => {
   try {
     const response = await fetch(
-      `api/ResultadoController.php?status=1&filter=true&userId=${userId}`,
+      `${API_URL}/ResultadoController.php?status=1&filter=true&userId=${userId}`,
       {
         credentials: "include",
       }
