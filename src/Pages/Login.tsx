@@ -43,6 +43,8 @@ const Login = () => {
     const { setUser, user } = useUserStore();
     const navigate = useNavigate();
 
+    const API_URL = import.meta.env.VITE_API_URL;
+
     const handleVerificarEmail = async () => {
         if (!email) {
             toast.warn("Digite um email válido.");
@@ -51,7 +53,7 @@ const Login = () => {
 
         try {
             const res = await fetch(
-                `api/AppUserController.php?getByEmail=${encodeURIComponent(email)}`
+                `${API_URL}/AppUserController.php?getByEmail=${encodeURIComponent(email)}`
             );
             const user = await res.json();
 
@@ -73,7 +75,7 @@ const Login = () => {
                 setCurrentStep(1);
             }
         } catch (err) {
-            toast.error("Email não existente na base de dados. Por favor, preencha os dados.");
+            toast.error("Erro ao verificar email. Tente novamente.");
             setCurrentStep(1);
         }
     };
@@ -87,7 +89,7 @@ const Login = () => {
         payload.append("perfilId", perfilSelecionado);
 
         try {
-            const response = await fetch("api/AppUserController.php", {
+            const response = await fetch(`${API_URL}/AppUserController.php`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/x-www-form-urlencoded",
@@ -131,7 +133,7 @@ const Login = () => {
                 setEstados(ordenados);
             });
 
-        fetch("api/PerfilController.php?getAll")
+        fetch(`${API_URL}/PerfilController.php?getAll`)
             .then((res) => res.json())
             .then((data) => {
                 if (Array.isArray(data)) setPerfis(data);
@@ -139,7 +141,6 @@ const Login = () => {
     }, []);
 
     useEffect(() => {
-
         if (user?.id) {
             navigate("/dashboard");
         }
@@ -172,7 +173,6 @@ const Login = () => {
                         ))}
                     </TabsList>
 
-                    {/* Step 1 - Email */}
                     <TabsContent value="step1">
                         <div className="p-4 flex flex-col justify-between min-h-[300px]">
                             <h2 className="text-xl font-bold mb-4">Digite seu Email</h2>
@@ -182,27 +182,21 @@ const Login = () => {
                                 type="email"
                                 onChange={(e) => setEmail(e.target.value)}
                             />
-                            <Button
-                                className="mt-4 bg-green-500 w-[84px]"
-                                onClick={handleVerificarEmail}
-                            >
+                            <Button className="mt-4 bg-green-500 w-[84px]" onClick={handleVerificarEmail}>
                                 Próximo
                             </Button>
                         </div>
                     </TabsContent>
 
-                    {/* Step 2 - Conta */}
                     <TabsContent value="step2">
                         <div className="p-4 flex flex-col justify-between min-h-[300px]">
                             <div className="flex flex-col gap-4">
                                 <h2 className="text-xl font-bold mb-2">Dados da Conta</h2>
-
                                 <Input
                                     placeholder="Nome completo"
                                     value={nome}
                                     onChange={(e) => setNome(e.target.value)}
                                 />
-
                                 <Select
                                     value={estadoSelecionado}
                                     onValueChange={(val) => {
@@ -221,7 +215,6 @@ const Login = () => {
                                         ))}
                                     </SelectContent>
                                 </Select>
-
                                 <Select
                                     value={cidadeSelecionada}
                                     onValueChange={(val) => setCidadeSelecionada(val)}
@@ -238,7 +231,6 @@ const Login = () => {
                                         ))}
                                     </SelectContent>
                                 </Select>
-
                                 <Select
                                     value={perfilSelecionado}
                                     onValueChange={(val) => setPerfilSelecionado(val)}
@@ -255,7 +247,6 @@ const Login = () => {
                                     </SelectContent>
                                 </Select>
                             </div>
-
                             <div className="flex justify-between mt-4">
                                 <Button variant="secondary" onClick={() => setCurrentStep(0)}>
                                     Voltar
@@ -274,7 +265,6 @@ const Login = () => {
                         </div>
                     </TabsContent>
 
-                    {/* Step 3 - Confirmação */}
                     <TabsContent value="step3">
                         <div className="p-4 flex flex-col justify-between min-h-[300px]">
                             <h2 className="text-xl font-bold mb-4">Confirmação</h2>
@@ -282,7 +272,6 @@ const Login = () => {
                             <p><strong>Nome:</strong> {nome}</p>
                             <p><strong>Estado:</strong> {estadoSelecionado}</p>
                             <p><strong>Cidade:</strong> {cidadeSelecionada}</p>
-
                             <div className="flex justify-between mt-4">
                                 <Button variant="secondary" onClick={() => setCurrentStep(1)}>
                                     Voltar
