@@ -20,25 +20,29 @@ const SideBar: React.FC<Props> = ({ className }) => {
   const logout = useUserStore((state) => state.logout);
   const navigate = useNavigate();
 
- const API_URL = import.meta.env.VITE_API_URL;
-  const handleLogout = async () => {
-    try {
-      const response = await fetch(`${API_URL}/UsuarioController.php?deslogar`, {
-        method: "GET",
-        credentials: "include",
-      });
+ const handleLogout = async () => {
+  const proxiedURL = `https://mistureapp.com.br/proxy.php?url=${encodeURIComponent(
+    "https://mistureapp.com.br/controller/UsuarioController.php?deslogar"
+  )}`;
 
-      if (response.ok) {
-        logout();
-        navigate("/");
-      } else {
-        toast.error("Erro ao deslogar. Tente novamente.");
-      }
-    } catch (error) {
-      console.error("Erro ao deslogar:", error);
+  try {
+    const response = await fetch(proxiedURL, {
+      method: "GET",
+      credentials: "include",
+    });
+
+    if (response.ok) {
+      logout();
+      navigate("/");
+    } else {
       toast.error("Erro ao deslogar. Tente novamente.");
     }
-  };
+  } catch (error) {
+    console.error("Erro ao deslogar:", error);
+    toast.error("Erro ao deslogar. Tente novamente.");
+  }
+};
+
 
   return (
     <div className={twMerge(location.pathname === '/login' ? 'hidden' : 'block', className)}>
