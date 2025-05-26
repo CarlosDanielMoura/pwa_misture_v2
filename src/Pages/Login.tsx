@@ -55,96 +55,78 @@ const Login = () => {
   const API_BASE = "https://mistureapp.com.br/controller";
 
   const handleVerificarEmail = async () => {
-    if (!email) {
-      toast.warn("Digite um email válido.");
+  if (!email) {
+    toast.warn("Digite um email válido.");
+    return;
+  }
+
+  try {
+    // Codifica o e-mail apenas uma vez
+    const rawUrl = `${API_BASE}/AppUserController.php?getByEmail=${encodeURIComponent(email)}`;
+    const url = `https://mistureapp.com.br/proxy.php?url=${encodeURIComponent(rawUrl)}`;
+
+    const res = await fetch(url);
+
+    if (!res.ok) {
+      toast.error(`Erro na requisição: ${res.status} ${res.statusText}`);
+      setCurrentStep(1);
       return;
     }
 
-    try {
-      const url = proxiedUrl(`${API_BASE}/AppUserController.php?getByEmail=${encodeURIComponent(email)}`);
-      const res = await fetch(url);
+    const user = await res.json();
 
-      if (!res.ok) {
-        // Se status HTTP não for 2xx, mostre erro e pule parse JSON
-        toast.error(`Erro na requisição: ${res.status} ${res.statusText}`);
-        setCurrentStep(1);
-        return;
-      }
-
-      const user = await res.json();
-
-      if (user && user.id) {
-        setUser({
-          id: user.id,
-          email: user.email,
-          nome: user.nome,
-          perfilId: user.perfil.id.toString(),
-          perfilDesc: user.perfil.descricao,
-          cidade: user.cidade,
-          estado: user.uf.toUpperCase(),
-        });
-
-        toast.success("Login realizado com sucesso!");
-        navigate("/dashboard");
-      } else {
-        toast.info("Email não encontrado. Preencha os dados para cadastro.");
-        setCurrentStep(1);
-      }
-    } catch (err) {
-      toast.error("Erro ao verificar email. Tente novamente.");
-      setCurrentStep(1);
-    }
-  };
-
-  const handleFinalizar = async () => {
-    const payload = new URLSearchParams();
-    payload.append("email", email);
-    payload.append("uf", estadoSelecionado);
-    payload.append("nome", nome);
-    payload.append("cidade", cidadeSelecionada);
-    payload.append("perfilId", perfilSelecionado);
-
-    try {
-      const url = proxiedUrl(`${API_BASE}/AppUserController.php`);
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: payload.toString(),
+    if (user && user.id) {
+      setUser({
+        id: user.id,
+        email: user.email,
+        nome: user.nome,
+        perfilId: user.perfil.id.toString(),
+        perfilDesc: user.perfil.descricao,
+        cidade: user.cidade,
+        estado: user.uf.toUpperCase(),
       });
 
-      if (!response.ok) {
-        toast.error(`Erro na requisição: ${response.status} ${response.statusText}`);
-        return;
-      }
-
-      const data = await response.json();
-
-      if (!data.message) {
-        toast.success("Cadastro realizado com sucesso!");
-        setUser({
-          id: data.id,
-          email: data.email,
-          nome: data.nome,
-          perfilId: data.perfil.id.toString(),
-          perfilDesc: data.perfil.descricao,
-          cidade: data.cidade,
-          estado: data.uf.toUpperCase(),
-        });
-
-        setTimeout(() => {
-          navigate("/dashboard");
-        }, 2000);
-      } else {
-        toast.error(data.message);
-      }
-    } catch (error) {
-      console.error("Erro ao cadastrar:", error);
-      toast.error("Erro ao cadastrar. Tente novamente.");
+      toast.success("Login realizado com sucesso!");
+      navigate("/dashboard");
+    } else {
+      toast.info("Email não encontrado. Preencha os dados para cadastro.");
+      setCurrentStep(1);
     }
-  };
+  } catch (err) {
+    toast.error("Erro ao verificar email. Tente novamente.");
+    setCurrentStep(1);
+  }
+};
+  const handleFinalizar = async () => {
+  const payload = new URLSearchParams({
+    email,
+    uf: estadoSelecionado,
+    nome,
+    cidade: cidadeSelecionada,
+    perfilId: perfilSelecionado,
+  });
 
+  const rawUrl = `${API_BASE}/AppUserController.php`;
+  const proxyUrl = `https://mistureapp.com.br/proxy.php?url=${encodeURIComponent(rawUrl)}`;
+
+  try {
+    const res = await fetch(proxyUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: payload.toString(),
+    });
+
+    if (!res.ok) {
+      toast.error(`Erro ao cadastrar: ${res.status} ${res.statusText}`);
+      return;
+    }
+
+    toast.success("Cadastro realizado com sucesso!");
+    navigate("/dashboard");
+  } catch (error) {
+    toast.error("Erro ao cadastrar. Tente novamente.");
+  }
+};
   useEffect(() => {
     // Busca estados IBGE direto (não precisa proxy)
     fetch("https://servicodados.ibge.gov.br/api/v1/localidades/estados")
