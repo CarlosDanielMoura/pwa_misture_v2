@@ -20,7 +20,7 @@ const SideBar: React.FC<Props> = ({ className }) => {
   const logout = useUserStore((state) => state.logout);
   const navigate = useNavigate();
 
-
+ const API_URL = import.meta.env.VITE_API_URL;
   const handleLogout = async () => {
     try {
       const response = await fetch(`${API_URL}/UsuarioController.php?deslogar`, {
