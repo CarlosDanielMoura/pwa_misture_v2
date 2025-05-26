@@ -54,8 +54,14 @@ const Login = () => {
 
   const API_BASE = "https://mistureapp.com.br/controller";
 
+  function isEmailValido(email: string): boolean {
+  const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return regex.test(email);
+}
+
+  
   const handleVerificarEmail = async () => {
-  if (!email) {
+  if (!isEmailValido(email)) {
     toast.warn("Digite um email válido.");
     return;
   }
