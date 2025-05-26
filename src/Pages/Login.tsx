@@ -61,15 +61,21 @@ const Login = () => {
   }
 
   try {
-    // Codifica o e-mail apenas uma vez
     const rawUrl = `${API_BASE}/AppUserController.php?getByEmail=${encodeURIComponent(email)}`;
     const url = `https://mistureapp.com.br/proxy.php?url=${encodeURIComponent(rawUrl)}`;
 
     const res = await fetch(url);
 
-    if (!res.ok) {
-      toast.error(`Erro na requisição: ${res.status} ${res.statusText}`);
+    if (res.status === 404) {
+      // Email não encontrado - leva para cadastro
+      toast.info("Email não encontrado. Preencha os dados para cadastro.");
       setCurrentStep(1);
+      return;
+    }
+
+    if (!res.ok) {
+      // Outro erro qualquer
+      toast.error(`Erro na requisição: ${res.status} ${res.statusText}`);
       return;
     }
 
@@ -89,14 +95,15 @@ const Login = () => {
       toast.success("Login realizado com sucesso!");
       navigate("/dashboard");
     } else {
+      // Caso raro - API não retornou usuário nem 404
       toast.info("Email não encontrado. Preencha os dados para cadastro.");
       setCurrentStep(1);
     }
   } catch (err) {
     toast.error("Erro ao verificar email. Tente novamente.");
-    setCurrentStep(1);
   }
 };
+
   const handleFinalizar = async () => {
   const payload = new URLSearchParams({
     email,
