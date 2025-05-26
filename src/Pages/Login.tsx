@@ -36,7 +36,6 @@ interface Perfil {
   descricao: string;
 }
 
-// 🔧 Função utilitária para montar URLs com o proxy
 const proxiedUrl = (url: string) =>
   `https://mistureapp.com.br/proxy.php?url=${encodeURIComponent(url)}`;
 
@@ -64,6 +63,14 @@ const Login = () => {
     try {
       const url = proxiedUrl(`${API_BASE}/AppUserController.php?getByEmail=${encodeURIComponent(email)}`);
       const res = await fetch(url);
+
+      if (!res.ok) {
+        // Se status HTTP não for 2xx, mostre erro e pule parse JSON
+        toast.error(`Erro na requisição: ${res.status} ${res.statusText}`);
+        setCurrentStep(1);
+        return;
+      }
+
       const user = await res.json();
 
       if (user && user.id) {
@@ -107,6 +114,11 @@ const Login = () => {
         body: payload.toString(),
       });
 
+      if (!response.ok) {
+        toast.error(`Erro na requisição: ${response.status} ${response.statusText}`);
+        return;
+      }
+
       const data = await response.json();
 
       if (!data.message) {
@@ -134,7 +146,7 @@ const Login = () => {
   };
 
   useEffect(() => {
-    // Estados do IBGE (sem proxy pois não precisa)
+    // Busca estados IBGE direto (não precisa proxy)
     fetch("https://servicodados.ibge.gov.br/api/v1/localidades/estados")
       .then((res) => res.json())
       .then((data) => {
@@ -144,9 +156,15 @@ const Login = () => {
         setEstados(ordenados);
       });
 
-    // Perfis (com proxy)
+    // Busca perfis via proxy
     fetch(proxiedUrl(`${API_BASE}/PerfilController.php?getAll`))
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.ok) {
+          toast.error(`Erro ao carregar perfis: ${res.status}`);
+          return null;
+        }
+        return res.json();
+      })
       .then((data) => {
         if (Array.isArray(data)) setPerfis(data);
       });
