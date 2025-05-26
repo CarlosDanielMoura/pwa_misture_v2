@@ -23,7 +23,7 @@ const SideBar: React.FC<Props> = ({ className }) => {
 
   const handleLogout = async () => {
     try {
-      const response = await fetch("/UsuarioController.php?deslogar", {
+      const response = await fetch(`${API_URL}/UsuarioController.php?deslogar`, {
         method: "GET",
         credentials: "include",
       });
