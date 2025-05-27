@@ -19,7 +19,6 @@ declare module "virtual:pwa-register" {
 // Isso aqui é essencial pro import.meta.env funcionar corretamente:
 interface ImportMetaEnv {
   readonly VITE_API_URL: string;
-  // adicione mais variáveis do .env aqui se tiver outras
 }
 
 interface ImportMeta {
