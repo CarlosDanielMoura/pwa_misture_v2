@@ -12,8 +12,6 @@ import { useNavigate } from "react-router";
 import { normalizeText } from "@/Utils/normalizeText";
 import { useUserStore } from "@/store/userStore";
 
-
-
 const DashBoard = () => {
   const [searchHistory, setSearchHistory] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -23,7 +21,6 @@ const DashBoard = () => {
   const navigate = useNavigate();
 
   const { user } = useUserStore();
-
 
   const [filtros, setFiltros] = useState({
     cultura: "",
@@ -120,12 +117,10 @@ const DashBoard = () => {
       );
     })
     .sort((a, b) => {
-      // Ordena pelo campo 'cultura' (alfabeticamente)
       const culturaA = normalizeText(a.cultura || "");
       const culturaB = normalizeText(b.cultura || "");
       return culturaA.localeCompare(culturaB);
     });
-  console.log("Resultados filtrados:", resFiltrados);
 
   const totalPaginas = Math.ceil(resFiltrados.length / itensPorPagina);
   const resPaginados = resFiltrados.slice(
@@ -141,6 +136,44 @@ const DashBoard = () => {
     },
     {}
   );
+
+  // Função para lidar com o clique nos ícones de cultura
+  const handleCulturaClick = (cultura: string) => {
+    // Se já está filtrado, reseta o filtro
+    if (filtros.cultura === cultura) {
+      setFiltrosTemporarios(prev => ({ ...prev, cultura: "" }));
+      setFiltros(prev => ({ ...prev, cultura: "" }));
+    } else {
+      // Caso contrário, aplica o filtro
+      setFiltrosTemporarios(prev => ({ ...prev, cultura }));
+      setFiltros(prev => ({ ...prev, cultura }));
+    }
+    setPagina(0);
+  };
+
+  // Função para resetar todos os filtros
+  const resetAllFilters = () => {
+    setFiltrosTemporarios({
+      cultura: "",
+      resultado: "",
+      classe: "",
+      principio: "",
+      pais: "",
+      dosagemMin: "",
+      dosagemMax: "",
+    });
+    setFiltros({
+      cultura: "",
+      resultado: "",
+      classe: "",
+      principio: "",
+      pais: "",
+      dosagemMin: "",
+      dosagemMax: "",
+    });
+    setPagina(0);
+    toast.info("Todos os filtros foram resetados.");
+  };
 
   const handleSearch = () => {
     if (searchTerm.trim()) {
@@ -166,26 +199,7 @@ const DashBoard = () => {
   };
 
   const handleClearFilters = () => {
-    setFiltrosTemporarios({
-      cultura: "",
-      resultado: "",
-      classe: "",
-      principio: "",
-      pais: "",
-      dosagemMin: "",
-      dosagemMax: "",
-    });
-    setFiltros({
-      cultura: "",
-      resultado: "",
-      classe: "",
-      principio: "",
-      pais: "",
-      dosagemMin: "",
-      dosagemMax: "",
-    });
-    setPagina(0);
-    toast.info("Todos os filtros foram limpos.");
+    resetAllFilters();
   };
 
   useEffect(() => {
@@ -197,7 +211,6 @@ const DashBoard = () => {
           const somenteValidos = resultadosData.filter(
             (item) => item.resultado && item.cultura
           );
-          console.log("Resultados válidos:", somenteValidos);
           setRes(somenteValidos);
         }
       } catch (err) {
@@ -284,13 +297,10 @@ const DashBoard = () => {
       toast.error("Você está offline");
     };
 
-
     autenticarEBuscar();
-
 
     window.addEventListener("online", handleOnline);
     window.addEventListener("offline", handleOffline);
-
 
     return () => {
       window.removeEventListener("online", handleOnline);
@@ -298,24 +308,41 @@ const DashBoard = () => {
     };
   }, [navigate, user?.id]);
 
-
   return (
     <div className="w-full h-screen overflow-auto flex flex-col px-4 pb-20">
-      <h1 className="font-aceh text-3xl font-semibold mt-4 mb-3">Produtos</h1>
+      <div className="flex justify-between items-center mt-4 mb-3">
+        <h1 className="font-aceh text-3xl font-semibold">Produtos</h1>
 
-      {/* Ícones com contador */}
+        {/* Botão para resetar todos os filtros */}
+        {(filtros.cultura || filtros.resultado || filtros.classe || filtros.principio || filtros.pais || filtros.dosagemMin || filtros.dosagemMax) && (
+          <button
+            onClick={resetAllFilters}
+            className="flex items-center gap-1 text-red-500 text-sm"
+          >
+            <MdOutlineClose size={16} />
+            Resetar filtros
+          </button>
+        )}
+      </div>
+
+      {/* Ícones com contador - agora clicáveis */}
       <div className="flex gap-3 flex-wrap mb-4 justify-center">
         {Object.entries(culturaContagem).map(([cultura, count], index) => (
           <div
             key={index}
-            className="relative flex items-center justify-center w-14 h-14 bg-green-600 rounded-full shadow-md"
+            className={`relative flex items-center justify-center w-14 h-14 rounded-full shadow-md cursor-pointer ${filtros.cultura === cultura
+              ? "bg-green-800 ring-2 ring-offset-2 ring-green-500"
+              : "bg-green-600"
+              }`}
             title={cultura}
+            onClick={() => handleCulturaClick(cultura)}
           >
             <img
               src={iconesPorCultura[cultura] || iconesPorCultura["nd"]}
               width={30}
               height={30}
               alt={cultura}
+              className="filter brightness-0 invert"
             />
             <div className="absolute top-0 right-0 bg-green-400 rounded-full w-4 h-4 flex items-center justify-center text-xs">
               {count}
@@ -334,6 +361,7 @@ const DashBoard = () => {
             placeholder="Pesquisar Produto ..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleSearch()}
           />
           <VscAdd
             size={24}
@@ -345,7 +373,6 @@ const DashBoard = () => {
 
         <ReusableDialog title="Filtros Avançados" onConfirm={handleFilter}>
           <>
-            {/* Filtros dentro da modal */}
             <div className="flex flex-col gap-3">
               <select
                 className="border p-2 rounded"
@@ -356,14 +383,13 @@ const DashBoard = () => {
               >
                 <option value="">Todas as culturas</option>
                 {culturasDisponiveis
-                  .sort((a, b) => a.localeCompare(b)) // Ordenando as culturas
+                  .sort((a, b) => a.localeCompare(b))
                   .map((cultura, idx) => (
                     <option key={idx} value={cultura}>
                       {cultura}
                     </option>
                   ))}
               </select>
-
 
               <select
                 className="border p-2 rounded"
@@ -443,7 +469,6 @@ const DashBoard = () => {
               />
             </div>
 
-            {/* Botão de limpar */}
             <button
               type="button"
               className="mt-4 w-full py-2 bg-red-100 text-red-600 rounded-md hover:bg-red-200 transition"
@@ -453,7 +478,6 @@ const DashBoard = () => {
             </button>
           </>
         </ReusableDialog>
-
       </div>
 
       {/* Histórico de pesquisa */}
@@ -478,6 +502,10 @@ const DashBoard = () => {
         {isLoading ? (
           <p className="text-gray-500 text-lg font-medium text-center">
             🔄 Carregando produtos...
+          </p>
+        ) : resPaginados.length === 0 ? (
+          <p className="text-gray-500 text-lg font-medium text-center">
+            Nenhum produto encontrado com os filtros atuais
           </p>
         ) : (
           <Card itens={resPaginados} />
